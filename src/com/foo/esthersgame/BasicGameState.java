@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 public class BasicGameState implements IGameState {
 
-	private static final int MOVERS_COUNT = 20;
+	private static final int MOVERS_COUNT = 1;
 	
 	private Mover[] movers = new Mover[ MOVERS_COUNT ];
 	
@@ -46,6 +46,9 @@ public class BasicGameState implements IGameState {
 	public class Mover {
 		public double x;
 		public double y;
+		public double vx;
+		public double vy;
+		
 
 		public Mover(String hexCode, Bundle savedInstanceState) {
 			if ( savedInstanceState != null &&
@@ -54,17 +57,26 @@ public class BasicGameState implements IGameState {
 					){
 				x = savedInstanceState.getDouble( hexCode+".x" );
 				y = savedInstanceState.getDouble( hexCode+".y" );
+				vx = savedInstanceState.getDouble( hexCode+".vx" );
+				vy = savedInstanceState.getDouble( hexCode+".vy" );
 			}else{
 				x = Math.random();
 				y = Math.random();
+				vx = Math.random() - 0.5;
+				vy = Math.random() - 0.5;
 			}
 		}
 
+		private static final double XRANGE = 10.0;
+		private static final double YRANGE = 10.0;
+		
 		public void tick() {
-			x += (Math.random()/8.0);
-			y += (Math.random()/8.0);
-			if ( x > 1.0 ) x -= 1.0;
-			if ( y > 1.0 ) y -= 1.0;
+			x += vx * 0.1;
+			y += vy * 0.1;
+			if ( x > XRANGE ) x -= XRANGE * 2;
+			if ( y > YRANGE ) y -= YRANGE * 2;
+			if ( x < -XRANGE ) x += XRANGE * 2;
+			if ( y < -YRANGE ) y += YRANGE * 2;
 		}
 
 	//	public void saveState(String hexCode, Bundle instanceState) {
