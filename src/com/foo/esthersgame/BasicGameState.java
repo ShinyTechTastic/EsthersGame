@@ -2,7 +2,7 @@ package com.foo.esthersgame;
 
 import android.os.Bundle;
 
-public class BasicGameState implements IGameState {
+public class BasicGameState extends AbstractGameState {
 
 	private static final int MOVERS_COUNT = 20;
 	
@@ -17,9 +17,9 @@ public class BasicGameState implements IGameState {
 	}
 
 	@Override
-	public void tick() {
+	public void tick( double t ) {
 		for ( int n =0 ; n < MOVERS_COUNT ; n++ ){
-			movers[n].tick();
+			movers[n].tick( t );
 		}
 	}
 
@@ -32,16 +32,9 @@ public class BasicGameState implements IGameState {
 	@Override
 	public void render(IRenderTarget render) {
 		for ( int n =0 ; n < MOVERS_COUNT ; n++ ){
-			render.drawShape( n , movers[n].x , movers[n].y );
+			movers[n].render( n , render );
 		}	
 	}
-	//@Override
-	//public void saveState(Bundle instanceState) {
-	//	for ( int n =0 ; n < MOVERS_COUNT ; n++ ){
-	//		String hexCode = "Mover."+Integer.toHexString(n);
-	//		movers[n].saveState( hexCode , instanceState );
-	//	}	
-	//}
 
 	public class Mover {
 		public double x;
@@ -67,12 +60,16 @@ public class BasicGameState implements IGameState {
 			}
 		}
 
+		public void render(int n , IRenderTarget render) {
+			render.drawShape( n , x ,y );
+		}
+
 		private static final double XRANGE = 1.0;
 		private static final double YRANGE = 1.0;
 		
-		public void tick() {
-			x += vx * 0.1;
-			y += vy * 0.1;
+		public void tick( double t ) {
+			x += vx * t;
+			y += vy * t;
 			if ( x > XRANGE ) x -= XRANGE * 2;
 			if ( y > YRANGE ) y -= YRANGE * 2;
 			if ( x < -XRANGE ) x += XRANGE * 2;

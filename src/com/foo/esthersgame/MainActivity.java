@@ -7,20 +7,25 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MotionEvent;
+import android.view.Window;
+import android.view.WindowManager;
 
 public class MainActivity extends Activity {
 
 	private static final String GAMESTATE_CLASS = "GameState-Class";
 	private static final String GAME_TAG = "Esther";
 	
-	private IGameState gameState;
+	private AbstractGameState gameState;
     private GLSurfaceView mGLView;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        requestWindowFeature( Window.FEATURE_NO_TITLE );
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, 
+        		WindowManager.LayoutParams.FLAG_FULLSCREEN );
         
         if ( savedInstanceState != null ){
 	    	String className = savedInstanceState.getString( GAMESTATE_CLASS , com.foo.esthersgame.BasicGameState.class.getCanonicalName() );
@@ -28,7 +33,7 @@ public class MainActivity extends Activity {
 	        	Class<?> targetClass = MainActivity.class.getClassLoader().loadClass( className );
 	        	Constructor<?> classConstruction = targetClass.getConstructor();
 	        	Object instance = classConstruction.newInstance();
-	        	gameState = (IGameState)instance;
+	        	gameState = (AbstractGameState)instance;
 	        	gameState.prepare( savedInstanceState );
 	        }catch(Exception e ){
 	        	Log.e(GAME_TAG, "Error creating GameState of class "+className );
@@ -67,7 +72,7 @@ class MyGLSurfaceView extends GLSurfaceView {
 
     private final MyGLRenderer mRenderer;
 
-    public MyGLSurfaceView(Context context, IGameState gameState) {
+    public MyGLSurfaceView(Context context, AbstractGameState gameState) {
         super(context);
 
         // Create an OpenGL ES 2.0 context.
