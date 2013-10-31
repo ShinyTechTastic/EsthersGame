@@ -111,7 +111,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 	        // Draw triangle
 	        //mSquare.draw(mDrawMatrix);
-	        mTriangle.draw(mTempMatrix);
+	        mTriangle.draw(mTempMatrix , n );
 		}
 
 	}
@@ -200,7 +200,11 @@ class Triangle {
     private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
 
     // Set color with red, green, blue and alpha (opacity) values
-    float color[] = { 0.63671875f, 0.76953125f, 0.22265625f, 0.3f };
+    private static final int COLOURS = 4;
+    float color[] = { 0.63671875f, 0.76953125f, 0.22265625f, 0.3f ,
+    		 0.76953125f, 0.22265625f, 0.63671875f, 0.3f ,
+    		0.22265625f, 0.63671875f, 0.76953125f, 0.3f ,
+    		0.63671875f, 0.22265625f,0.76953125f,  0.3f };
 
     public Triangle() {
         // initialize vertex byte buffer for shape coordinates
@@ -230,7 +234,7 @@ class Triangle {
 
     }
 
-    public void draw(float[] mvpMatrix) {
+    public void draw(float[] mvpMatrix, int n) {
         // Add program to OpenGL environment
         GLES20.glUseProgram(mProgram);
 
@@ -249,7 +253,7 @@ class Triangle {
         mColorHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
 
         // Set color for drawing the triangle
-        GLES20.glUniform4fv(mColorHandle, 1, color, 0);
+        GLES20.glUniform4fv(mColorHandle, 1, color, 4*(n%COLOURS));
 
         // get handle to shape's transformation matrix
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
