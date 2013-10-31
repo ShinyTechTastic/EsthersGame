@@ -97,23 +97,21 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
     public class InnerRenderTarget implements IRenderTarget {
 
+		private float[] mModelMatrix = new float[16]; // 4x4 matrix
 		private float[] mTempMatrix = new float[16]; // 4x4 matrix
 
 		@Override
 		public void drawShape(int n, double x, double y) {
-
-			//Matrix.setIdentityM(mTempMatrix, 0); // initialize to identity matrix
-			//Matrix.translateM(mTempMatrix, 0, mAngle, 0, 0); // translation to the left
+			Matrix.setRotateM(mModelMatrix, 0, mAngle, 0, 0, -1.0f);
+			Matrix.translateM( mModelMatrix, 0, (float)x, (float)y, 0);
 			
-			Matrix.setRotateM(mTempMatrix, 0, mAngle ,0, 0, -1.0f);
-			Matrix.translateM(mTempMatrix, 0, (float)x, (float)y, 0.0f);
-			//Matrix.multiplyMM(mModelMatrix, 0, mTempMatrix, 0, mRotationMatrix, 0);
-			Matrix.multiplyMM(mDrawMatrix, 0, mTempMatrix, 0, mMVPMatrix, 0);
-//			Matrix.multiplyMM(mDrawMatrix, 0, mMVPMatrix, 0, mTempMatrix, 0);
+			//float[] scratch = new float[16];
+			// Combine the rotation matrix with the projection and camera view
+			Matrix.multiplyMM(mTempMatrix, 0, mMVPMatrix, 0, mModelMatrix, 0);			
 
 	        // Draw triangle
 	        //mSquare.draw(mDrawMatrix);
-	        mTriangle.draw(mDrawMatrix);
+	        mTriangle.draw(mTempMatrix);
 		}
 
 	}
@@ -175,7 +173,7 @@ class Triangle {
         "attribute vec4 vPosition;" +
         "void main() {" +
         // the matrix must be included as a modifier of gl_Position
-        "  gl_Position = vPosition * uMVPMatrix;" +
+        "  gl_Position = uMVPMatrix * vPosition;" +
         "}";
 
     private final String fragmentShaderCode =

@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 public class BasicGameState implements IGameState {
 
-	private static final int MOVERS_COUNT = 1;
+	private static final int MOVERS_COUNT = 20;
 	
 	private Mover[] movers = new Mover[ MOVERS_COUNT ];
 	
@@ -67,8 +67,8 @@ public class BasicGameState implements IGameState {
 			}
 		}
 
-		private static final double XRANGE = 10.0;
-		private static final double YRANGE = 10.0;
+		private static final double XRANGE = 1.0;
+		private static final double YRANGE = 1.0;
 		
 		public void tick() {
 			x += vx * 0.1;
