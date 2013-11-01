@@ -30,7 +30,7 @@ public class Star extends AbstractShape {
     	coords[2] = 0;
     	for ( int n = 1 ;n < vertexCount ; n++ ){
     		double rad = ((Math.PI*2) / (2*points)) * n;
-    		double dist = 0.01 + ((n%2)*0.01);
+    		double dist = 0.1 + ((n%2)*0.1);
     		coords[ n * COORDS_PER_VERTEX + 0 ] = (float) (/* x */ dist * Math.sin( rad ));
     		coords[ n * COORDS_PER_VERTEX + 1 ] = (float) (/* y */ dist * Math.cos( rad ));
     		coords[ n * COORDS_PER_VERTEX + 2 ] = /* z */ 0.0f;
