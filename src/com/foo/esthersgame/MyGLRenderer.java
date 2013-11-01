@@ -24,6 +24,7 @@ import javax.microedition.khronos.opengles.GL10;
 import com.foo.esthersgame.shapes.AbstractShape;
 import com.foo.esthersgame.shapes.Polygon;
 import com.foo.esthersgame.shapes.Square;
+import com.foo.esthersgame.shapes.Star;
 import com.foo.esthersgame.shapes.Triangle;
 
 import android.opengl.GLES20;
@@ -58,10 +59,10 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glBlendFunc( GLES20.GL_SRC_ALPHA , GLES20.GL_ONE_MINUS_SRC_ALPHA );
 
         mShapes = new AbstractShape[5];
-    	mShapes[0] = new Polygon( 3 );
-    	mShapes[1] = new Polygon( 7 );
-    	mShapes[2] = new Polygon( 6 );
-    	mShapes[3] = new Polygon( 5 );
+    	mShapes[0] = new Star( 3 );
+    	mShapes[1] = new Star( 7 );
+    	mShapes[2] = new Star( 6 );
+    	mShapes[3] = new Star( 5 );
     	mShapes[4] = new Polygon( 4 );
         
         mInnerRenderTarget = new InnerRenderTarget();

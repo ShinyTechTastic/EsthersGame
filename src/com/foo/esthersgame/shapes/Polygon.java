@@ -9,7 +9,8 @@ import com.foo.esthersgame.MyGLRenderer;
 import android.opengl.GLES20;
 
 public class Polygon extends AbstractShape {
-           private final FloatBuffer vertexBuffer;
+	
+        private final FloatBuffer vertexBuffer;
         private final int mProgram;
         private int mPositionHandle;
         private int mColorHandle;
