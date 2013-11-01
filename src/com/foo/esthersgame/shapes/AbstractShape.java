@@ -18,16 +18,20 @@ public abstract class AbstractShape {
             "void main() {" +
             "  gl_FragColor = vColor;" +
             "}";
-        
-
-
-    // Set color with red, green, blue and alpha (opacity) values
-    protected static final int COLOURS = 4;
-    float color[] = { 0.63671875f, 0.76953125f, 0.22265625f, 0.3f ,
-    		 0.76953125f, 0.22265625f, 0.63671875f, 0.3f ,
-    		0.22265625f, 0.63671875f, 0.76953125f, 0.3f ,
-    		0.63671875f, 0.22265625f,0.76953125f,  0.3f };
     
-	abstract public void draw(float[] mTempMatrix, int n);
+    private float[] mfAcolour = new float[4];
+    
+    public float[] getColour( float colour ){
+    	double rad = colour * 2 * Math.PI;
+    	mfAcolour[0] = (float)((Math.sin( rad ) * 0.5 ) + 0.5);
+    	rad += (Math.PI * 2.0 / 3.0);
+    	mfAcolour[1] = (float)((Math.sin( rad ) * 0.5 ) + 0.5);
+    	rad += (Math.PI * 2.0 / 3.0);
+    	mfAcolour[2] = (float)((Math.sin( rad ) * 0.5 ) + 0.5);
+    	mfAcolour[3] = 0.3f; // opacity is constant
+    	return mfAcolour;
+    }
+    
+	abstract public void draw(float[] mTempMatrix, float colour);
 
 }

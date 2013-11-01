@@ -37,14 +37,14 @@ public class BasicGameState extends AbstractGameState {
 	}
 
 	public class Mover {
-		public double x;
-		public double y;
-		public double vx;
-		public double vy;
+		public float x;
+		public float y;
+		public float vx;
+		public float vy;
 		
 
 		public Mover(String hexCode, Bundle savedInstanceState) {
-			if ( savedInstanceState != null &&
+			/*if ( savedInstanceState != null &&
 				savedInstanceState.containsKey(hexCode+".x") &&
 				savedInstanceState.containsKey(hexCode+".y")
 					){
@@ -52,20 +52,20 @@ public class BasicGameState extends AbstractGameState {
 				y = savedInstanceState.getDouble( hexCode+".y" );
 				vx = savedInstanceState.getDouble( hexCode+".vx" );
 				vy = savedInstanceState.getDouble( hexCode+".vy" );
-			}else{
-				x = Math.random();
-				y = Math.random();
-				vx = Math.random() - 0.5;
-				vy = Math.random() - 0.5;
-			}
+			}else{*/
+				x = (float) Math.random();
+				y = (float) Math.random();
+				vx = (float) (Math.random() - 0.5);
+				vy = (float) (Math.random() - 0.5);
+			//}
 		}
 
 		public void render(int n , IRenderTarget render) {
-			render.drawShape( n , x ,y );
+			render.drawShape( n , n / 10.0f , x ,y );
 		}
 
-		private static final double XRANGE = 1.0;
-		private static final double YRANGE = 1.0;
+		private static final float XRANGE = 1.0f;
+		private static final float YRANGE = 1.0f;
 		
 		public void tick( double t ) {
 			x += vx * t;

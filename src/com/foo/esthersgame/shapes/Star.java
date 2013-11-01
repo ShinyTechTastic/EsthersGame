@@ -62,7 +62,7 @@ public class Star extends AbstractShape {
 
     }
 
-    public void draw(float[] mvpMatrix, int n) {
+    public void draw(float[] mvpMatrix, float colour) {
         // Add program to OpenGL environment
         GLES20.glUseProgram(mProgram);
 
@@ -81,7 +81,7 @@ public class Star extends AbstractShape {
         mColorHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
 
         // Set color for drawing the triangle
-        GLES20.glUniform4fv(mColorHandle, 1, color, 4*(n%COLOURS));
+        GLES20.glUniform4fv(mColorHandle, 1, this.getColour(colour) , 0 );
 
         // get handle to shape's transformation matrix
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");

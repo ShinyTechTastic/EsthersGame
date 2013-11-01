@@ -23,9 +23,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import com.foo.esthersgame.shapes.AbstractShape;
 import com.foo.esthersgame.shapes.Polygon;
-import com.foo.esthersgame.shapes.Square;
 import com.foo.esthersgame.shapes.Star;
-import com.foo.esthersgame.shapes.Triangle;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
@@ -58,12 +56,18 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glEnable( GLES20.GL_BLEND );
         GLES20.glBlendFunc( GLES20.GL_SRC_ALPHA , GLES20.GL_ONE_MINUS_SRC_ALPHA );
 
-        mShapes = new AbstractShape[5];
-    	mShapes[0] = new Star( 3 );
-    	mShapes[1] = new Star( 7 );
+        mShapes = new AbstractShape[11];
+    	mShapes[0] = new Star( 4 );
+    	mShapes[1] = new Star( 5 );
     	mShapes[2] = new Star( 6 );
-    	mShapes[3] = new Star( 5 );
-    	mShapes[4] = new Polygon( 4 );
+    	mShapes[3] = new Star( 7 );
+    	mShapes[4] = new Star( 8 );
+    	mShapes[5] = new Polygon( 3 );
+    	mShapes[6] = new Polygon( 4 );
+    	mShapes[7] = new Polygon( 5 );
+    	mShapes[8] = new Polygon( 6 );
+    	mShapes[9] = new Polygon( 7 );
+    	mShapes[10] = new Polygon( 8 );
         
         mInnerRenderTarget = new InnerRenderTarget();
     }
@@ -90,19 +94,33 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 		private float[] mTempMatrix = new float[16]; // 4x4 matrix
 
 		@Override
-		public void drawShape(int n, double x, double y) {
-			Matrix.setRotateM(mModelMatrix, 0, mAngle, 0, 0, -1.0f);
+		public void drawShape(int shape, float colour, float x, float y,
+				float rotation, float scale) {
+			//Matrix.setRotateM(mModelMatrix, 0, mAngle, 0, 0, -1.0f);
+			Matrix.setIdentityM(mModelMatrix , 0);
+			Matrix.scaleM(mModelMatrix, 0 , scale, scale, 0.0f );
 			Matrix.translateM( mModelMatrix, 0, (float)x, (float)y, 0);
-			
+			Matrix.rotateM(mModelMatrix, 0, rotation, 0.0f, 0.0f, -1.0f );
 			//float[] scratch = new float[16];
 			// Combine the rotation matrix with the projection and camera view
 			Matrix.multiplyMM(mTempMatrix, 0, mMVPMatrix, 0, mModelMatrix, 0);			
 
 	        // Draw triangle
 	        //mSquare.draw(mDrawMatrix);
-			int shape = (n % mShapes.length);
+			int shapeId = (shape % mShapes.length);
 			
-			mShapes[shape].draw( mTempMatrix , n );
+			mShapes[shapeId].draw( mTempMatrix , colour );
+		}
+
+		@Override
+		public void drawShape(int shape, float colour, float x, float y,
+				float rotation) {
+			this.drawShape(shape, colour, x, y , rotation , 1.0f );
+		}
+
+		@Override
+		public void drawShape(int shape, float colour, float x, float y) {
+			this.drawShape(shape, colour, x, y , 0.0f , 1.0f );
 		}
 
 	}
