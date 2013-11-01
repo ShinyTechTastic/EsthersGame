@@ -41,6 +41,10 @@ public class BasicGameState extends AbstractGameState {
 		public float y;
 		public float vx;
 		public float vy;
+		private float r;
+		private float vr;
+		private float c;
+		private float vc;
 		
 
 		public Mover(String hexCode, Bundle savedInstanceState) {
@@ -55,25 +59,37 @@ public class BasicGameState extends AbstractGameState {
 			}else{*/
 				x = (float) Math.random();
 				y = (float) Math.random();
+				r = (float) Math.random();
+				c = (float) Math.random();
 				vx = (float) (Math.random() - 0.5);
 				vy = (float) (Math.random() - 0.5);
+				vr = (float) (Math.random() - 0.5) * 60;
+				vc = (float) (Math.random() - 0.5);
 			//}
 		}
 
 		public void render(int n , IRenderTarget render) {
-			render.drawShape( n , n / 10.0f , x ,y );
+			render.drawShape( n , c , x ,y , r );
 		}
 
 		private static final float XRANGE = 1.0f;
 		private static final float YRANGE = 1.0f;
+		private static final float RRANGE = 180.0f;
+		private static final float CRANGE = (float)(Math.PI);
 		
 		public void tick( double t ) {
 			x += vx * t;
 			y += vy * t;
+			r += (vr * t);
+			c += (vc * t);
 			if ( x > XRANGE ) x -= XRANGE * 2;
 			if ( y > YRANGE ) y -= YRANGE * 2;
+			if ( r > RRANGE ) r -= RRANGE * 2;
+			if ( c > CRANGE ) c -= CRANGE * 2;
 			if ( x < -XRANGE ) x += XRANGE * 2;
 			if ( y < -YRANGE ) y += YRANGE * 2;
+			if ( r < -RRANGE ) r += RRANGE * 2;
+			if ( c < -CRANGE ) c += CRANGE * 2;
 		}
 
 	//	public void saveState(String hexCode, Bundle instanceState) {
