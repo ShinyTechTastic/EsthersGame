@@ -18,7 +18,7 @@ public abstract class AbstractGameState {
 	
 	abstract void prepare(Bundle savedInstanceState);
 	abstract void tick( double t );
-	abstract void press( double x , double y );
+	abstract void press( float x , float y );
 	//void saveState( Bundle instanceState );
 	
 	abstract void render( IRenderTarget render );

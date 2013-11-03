@@ -38,10 +38,15 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private final float[] mProjMatrix = new float[16];
     private final float[] mVMatrix = new float[16];
 
+    private float screenW = 0.0f;
+    private float screenH = 0.0f;
+    
     // Declare as volatile because we are updating it from another thread
     public volatile float mAngle;
 	private AbstractGameState gameState;
 	private IRenderTarget mInnerRenderTarget;
+	
+
 	
 	private AbstractShape[] mShapes; 
 
@@ -52,7 +57,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 	@Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         // Set the background frame color
-        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        GLES20.glClearColor(0.3f, 0.8f, 0.3f, 1.0f);
         GLES20.glEnable( GLES20.GL_BLEND );
         GLES20.glBlendFunc( GLES20.GL_SRC_ALPHA , GLES20.GL_ONE_MINUS_SRC_ALPHA );
 
@@ -130,6 +135,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // Adjust the viewport based on geometry changes,
         // such as screen rotation
         GLES20.glViewport(0, 0, width, height);
+        
+        screenW = width;
+        screenH = height;
 
         float ratio = (float) width / height;
 
@@ -171,4 +179,57 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
             throw new RuntimeException(glOperation + ": glError " + error);
         }
     }
+
+    private float[] worldPos = new float[2];
+    
+	public float[] getWorldPosition(float touch_x, float touch_y) {
+				       
+       // Auxiliary matrix and vectors
+       // to deal with ogl.
+       float[] invertedMatrix,
+           normalizedInPoint, outPoint;
+       
+       invertedMatrix = new float[16];
+       normalizedInPoint = new float[4];
+       outPoint = new float[4];
+
+       // Invert y coordinate, as android uses
+       // top-left, and ogl bottom-left.
+       int oglTouchY = (int) (screenH - touch_y);
+
+       /* Transform the screen point to clip
+       space in ogl (-1,1) */       
+       normalizedInPoint[0] =
+        (float) ((touch_x) * 2.0f / screenW - 1.0);
+       normalizedInPoint[1] =
+        (float) ((oglTouchY) * 2.0f / screenH - 1.0);
+       normalizedInPoint[2] = - 1.0f;
+       normalizedInPoint[3] = 1.0f;
+
+       /* Obtain the transform matrix and
+       then the inverse. */
+       Matrix.invertM(invertedMatrix, 0,
+    		   mProjMatrix, 0);       
+
+       /* Apply the inverse to the point
+       in clip space */
+       Matrix.multiplyMV(
+           outPoint, 0,
+           invertedMatrix, 0,
+           normalizedInPoint, 0);
+
+       if (outPoint[3] == 0.0)
+       {
+           // Avoid /0 error.
+           Log.e("World coords", "ERROR!");
+           return worldPos;
+       }
+
+       // Divide by the 3rd component to find
+       // out the real position.
+       worldPos[0] = outPoint[0] / outPoint[3];
+       worldPos[1] = outPoint[1] / outPoint[3];
+
+       return worldPos;
+	}
 }

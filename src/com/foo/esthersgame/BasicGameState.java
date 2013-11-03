@@ -24,9 +24,12 @@ public class BasicGameState extends AbstractGameState {
 	}
 
 	@Override
-	public void press(double x, double y) {
-		// TODO Auto-generated method stub
-		
+	public void press(float x, float y) {
+		for ( int n =0 ; n < MOVERS_COUNT ; n++ ){
+			movers[n].x = x;
+			movers[n].y = y;
+			
+		}
 	}
 
 	@Override
@@ -82,13 +85,13 @@ public class BasicGameState extends AbstractGameState {
 			y += vy * t;
 			r += (vr * t);
 			c += (vc * t);
-			if ( x > XRANGE ) x -= XRANGE * 2;
-			if ( y > YRANGE ) y -= YRANGE * 2;
-			if ( r > RRANGE ) r -= RRANGE * 2;
-			if ( c > CRANGE ) c -= CRANGE * 2;
+			if ( x >  XRANGE ) x -= XRANGE * 2;
 			if ( x < -XRANGE ) x += XRANGE * 2;
+			if ( y >  YRANGE ) y -= YRANGE * 2;
 			if ( y < -YRANGE ) y += YRANGE * 2;
+			if ( r >  RRANGE ) r -= RRANGE * 2;
 			if ( r < -RRANGE ) r += RRANGE * 2;
+			if ( c >  CRANGE ) c -= CRANGE * 2;
 			if ( c < -CRANGE ) c += CRANGE * 2;
 		}
 
