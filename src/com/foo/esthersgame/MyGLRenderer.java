@@ -227,7 +227,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
        // Divide by the 3rd component to find
        // out the real position.
-       worldPos[0] = outPoint[0] / outPoint[3];
+       worldPos[0] = -(outPoint[0] / outPoint[3]);
        worldPos[1] = outPoint[1] / outPoint[3];
 
        return worldPos;
