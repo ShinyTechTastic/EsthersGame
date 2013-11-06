@@ -246,9 +246,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 	public class InnerParticleSystem implements IPartcleSystem {
 
-		private static final int MAX_PARTICLES = 100;
-		private static final int PARTICLE_SIZE = 6;
-		private static final float PARTICLE_LIFE = 5.0f;
+		private static final int MAX_PARTICLES = 200; // max onscreen at once
+		private static final int PARTICLE_SIZE = 6; // floats in the data structure
+		private static final float PARTICLE_LIFE = 5.0f; // seconds to live
 		
 		private float[] data = new float[ PARTICLE_SIZE * MAX_PARTICLES ];
 		private int dataHead = 0;
@@ -280,6 +280,10 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 				data[ offset + 0 ] += data[ offset + 2 ] * t;
 				data[ offset + 1 ] += data[ offset + 3 ] * t;
+				if ( data[ offset + 1 ] < -1.0f ){ // bounce?
+					data[ offset + 1 ] = -2.0f - data[ offset + 1 ]; // bounce distance
+					data[ offset + 3 ] = data[ offset + 3 ] * -0.8f; // invert the vertical velocity and reduce slightly
+				}
 				data[ offset + 3 ] -= 0.5f * t; // g
 				data[ offset + 5 ] -= t;
 				
@@ -301,7 +305,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 				float c = data[ offset + 4 ];
 				float b = (data[ offset + 5 ] / PARTICLE_LIFE);
 				if ( b > 0.0f ){
-					mInnerRenderTarget.drawShape( mSquare , c , b , x, y , b , 1.0f );
+					mInnerRenderTarget.drawShape( mSquare , c , b , x, y , b * 90.0f , 1.0f );
 				}
 				i = (i+1) % MAX_PARTICLES;
 			}
