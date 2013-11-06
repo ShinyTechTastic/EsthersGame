@@ -23,6 +23,10 @@ public class Star extends AbstractShape {
     private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
 
     public Star( int points ) {
+    	this( points, 0.05f , 0.1f );
+    }
+
+    public Star( int points , float size1 , float size2 ) {
     	vertexCount = (2*points) + 2;
     	coords = new float[ vertexCount * COORDS_PER_VERTEX ];
     	coords[0] = 0;
@@ -30,7 +34,7 @@ public class Star extends AbstractShape {
     	coords[2] = 0;
     	for ( int n = 1 ;n < vertexCount ; n++ ){
     		double rad = ((Math.PI*2) / (2*points)) * n;
-    		double dist = 0.1 + ((n%2)*0.1);
+    		double dist = ( n%2==0)? size1: size2;
     		coords[ n * COORDS_PER_VERTEX + 0 ] = (float) (/* x */ dist * Math.sin( rad ));
     		coords[ n * COORDS_PER_VERTEX + 1 ] = (float) (/* y */ dist * Math.cos( rad ));
     		coords[ n * COORDS_PER_VERTEX + 2 ] = /* z */ 0.0f;
@@ -62,7 +66,7 @@ public class Star extends AbstractShape {
 
     }
 
-    public void draw(float[] mvpMatrix, float colour) {
+    public void draw(float[] mvpMatrix, float colour , float brightness ) {
         // Add program to OpenGL environment
         GLES20.glUseProgram(mProgram);
 
@@ -81,7 +85,7 @@ public class Star extends AbstractShape {
         mColorHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
 
         // Set color for drawing the triangle
-        GLES20.glUniform4fv(mColorHandle, 1, this.getColour(colour) , 0 );
+        GLES20.glUniform4fv(mColorHandle, 1, this.getColour(colour , brightness) , 0 );
 
         // get handle to shape's transformation matrix
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");

@@ -1,19 +1,28 @@
 package com.foo.esthersgame;
 
+import com.foo.esthersgame.particle.IPartcleSystem;
+
 import android.os.Bundle;
 
 public abstract class AbstractGameState {
-
-	long lastUpdate = 0;
 	
-	void tick(){
+	protected long lastUpdate = 0;
+	protected IPartcleSystem particle;
+	
+	public double tick(){
 		long now = System.currentTimeMillis();
 		long delta = now - lastUpdate;
 		lastUpdate = now;
 		if ( delta > 1000 ){
 			delta = 1000;
 		}
-		tick( (double)delta / 1000.0 );
+		double d = (double)delta / 1000.0 ;
+		tick( d );
+		return d;
+	}
+	
+	public void setParticleSystem( IPartcleSystem particle ){
+		this.particle = particle;
 	}
 	
 	abstract void prepare(Bundle savedInstanceState);

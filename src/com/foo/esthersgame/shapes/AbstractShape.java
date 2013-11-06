@@ -21,17 +21,17 @@ public abstract class AbstractShape {
     
     private float[] mfAcolour = new float[4];
     
-    public float[] getColour( float colour ){
+    public float[] getColour( float colour , float brightness ){
     	double rad = colour * 2 * Math.PI;
     	mfAcolour[0] = (float)((Math.sin( rad ) * 0.5 ) + 0.5);
     	rad += (Math.PI * 2.0 / 3.0);
     	mfAcolour[1] = (float)((Math.sin( rad ) * 0.5 ) + 0.5);
     	rad += (Math.PI * 2.0 / 3.0);
     	mfAcolour[2] = (float)((Math.sin( rad ) * 0.5 ) + 0.5);
-    	mfAcolour[3] = 0.8f; // opacity is constant
+    	mfAcolour[3] = brightness * 0.8f; // opacity is constant
     	return mfAcolour;
     }
     
-	abstract public void draw(float[] mTempMatrix, float colour);
+	abstract public void draw(float[] mTempMatrix, float colour, float brightness);
 
 }

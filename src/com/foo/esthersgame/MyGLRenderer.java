@@ -21,6 +21,7 @@ package com.foo.esthersgame;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import com.foo.esthersgame.particle.IPartcleSystem;
 import com.foo.esthersgame.shapes.AbstractShape;
 import com.foo.esthersgame.shapes.Polygon;
 import com.foo.esthersgame.shapes.Star;
@@ -45,9 +46,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     public volatile float mAngle;
 	private AbstractGameState gameState;
 	private IRenderTarget mInnerRenderTarget;
-	
+	private InnerParticleSystem mInnerParticleSystem;
 
-	
 	private AbstractShape[] mShapes; 
 
     public MyGLRenderer(AbstractGameState gameState) {
@@ -75,6 +75,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     	mShapes[10] = new Polygon( 8 );
         
         mInnerRenderTarget = new InnerRenderTarget();
+        mInnerParticleSystem = new InnerParticleSystem();
+        
+        gameState.setParticleSystem(mInnerParticleSystem);
     }
 
     @Override
@@ -90,45 +93,10 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         Matrix.multiplyMM(mMVPMatrix, 0, mProjMatrix, 0, mVMatrix, 0);
 
         gameState.render( mInnerRenderTarget );
-        gameState.tick();
+        double time = gameState.tick();
+        mInnerParticleSystem.tick( time );
+        mInnerParticleSystem.render();
     }
-
-    public class InnerRenderTarget implements IRenderTarget {
-
-		private float[] mModelMatrix = new float[16]; // 4x4 matrix
-		private float[] mTempMatrix = new float[16]; // 4x4 matrix
-
-		@Override
-		public void drawShape(int shape, float colour, float x, float y,
-				float rotation, float scale) {
-			//Matrix.setRotateM(mModelMatrix, 0, mAngle, 0, 0, -1.0f);
-			Matrix.setIdentityM(mModelMatrix , 0);
-			Matrix.scaleM(mModelMatrix, 0 , scale, scale, 0.0f );
-			Matrix.translateM( mModelMatrix, 0, (float)x, (float)y, 0);
-			Matrix.rotateM(mModelMatrix, 0, rotation, 0.0f, 0.0f, -1.0f );
-			//float[] scratch = new float[16];
-			// Combine the rotation matrix with the projection and camera view
-			Matrix.multiplyMM(mTempMatrix, 0, mMVPMatrix, 0, mModelMatrix, 0);			
-
-	        // Draw triangle
-	        //mSquare.draw(mDrawMatrix);
-			int shapeId = (shape % mShapes.length);
-			
-			mShapes[shapeId].draw( mTempMatrix , colour );
-		}
-
-		@Override
-		public void drawShape(int shape, float colour, float x, float y,
-				float rotation) {
-			this.drawShape(shape, colour, x, y , rotation , 1.0f );
-		}
-
-		@Override
-		public void drawShape(int shape, float colour, float x, float y) {
-			this.drawShape(shape, colour, x, y , 0.0f , 1.0f );
-		}
-
-	}
     
     @Override
     public void onSurfaceChanged(GL10 unused, int width, int height) {
@@ -231,5 +199,112 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
        worldPos[1] = outPoint[1] / outPoint[3];
 
        return worldPos;
+	}
+	
+
+    public class InnerRenderTarget implements IRenderTarget {
+
+		private float[] mModelMatrix = new float[16]; // 4x4 matrix
+		private float[] mTempMatrix = new float[16]; // 4x4 matrix
+
+
+		@Override
+		public void drawShape(AbstractShape shape, float colour,
+				float brightness, float x, float y, float rotation , float scale ) {
+
+			//Matrix.setRotateM(mModelMatrix, 0, mAngle, 0, 0, -1.0f);
+			Matrix.setIdentityM(mModelMatrix , 0);
+			Matrix.scaleM(mModelMatrix, 0 , scale, scale, 0.0f );
+			Matrix.translateM( mModelMatrix, 0, (float)x, (float)y, 0);
+			Matrix.rotateM(mModelMatrix, 0, rotation, 0.0f, 0.0f, -1.0f );
+			//float[] scratch = new float[16];
+			// Combine the rotation matrix with the projection and camera view
+			Matrix.multiplyMM(mTempMatrix, 0, mMVPMatrix, 0, mModelMatrix, 0);			
+
+			shape.draw( mTempMatrix , colour , brightness );
+		}
+			
+		@Override
+		public void drawShape(int shape, float colour, float x, float y,
+				float rotation, float scale) {
+			int shapeId = (shape % mShapes.length);
+			this.drawShape( mShapes[shapeId] , colour , 1.0f , x , y , rotation , scale );
+		}
+
+		@Override
+		public void drawShape(int shape, float colour, float x, float y,
+				float rotation) {
+			this.drawShape(shape, colour, x, y , rotation , 1.0f );
+		}
+
+		@Override
+		public void drawShape(int shape, float colour, float x, float y) {
+			this.drawShape(shape, colour, x, y , 0.0f , 1.0f );
+		}
+
+	}
+
+	public class InnerParticleSystem implements IPartcleSystem {
+
+		private static final int MAX_PARTICLES = 100;
+		private static final int PARTICLE_SIZE = 6;
+		private static final float PARTICLE_LIFE = 5.0f;
+		
+		private float[] data = new float[ PARTICLE_SIZE * MAX_PARTICLES ];
+		private int dataHead = 0;
+		private int dataTail = 0;
+		
+		private Polygon mSquare = new Polygon( 8 , 0.04f );
+		
+		@Override
+		public void create(float x, float y, float vx, float vy, float colour) {
+			int offset = dataHead * PARTICLE_SIZE;
+			data[ offset + 0 ] = x;
+			data[ offset + 1 ] = y;
+			data[ offset + 2 ] = vx;
+			data[ offset + 3 ] = vy;
+			data[ offset + 4 ] = colour;
+			data[ offset + 5 ] = PARTICLE_LIFE; // TTL
+
+			dataHead = (dataHead +1) % MAX_PARTICLES;
+			if ( dataHead == dataTail ){
+				// no space...
+				dataTail = (dataTail +1) % MAX_PARTICLES;
+			}
+		}
+
+		public void tick( double t ){
+			int i = dataTail;
+			while ( i != dataHead ){
+				int offset = i * PARTICLE_SIZE;
+
+				data[ offset + 0 ] += data[ offset + 2 ] * t;
+				data[ offset + 1 ] += data[ offset + 3 ] * t;
+				data[ offset + 3 ] -= 0.5f * t; // g
+				data[ offset + 5 ] -= t;
+				
+				if ( data[ offset + 5 ] < 0.0 ){
+					// this has expired
+					dataTail = i; // catchup the tail.
+				}
+				
+				i = (i+1) % MAX_PARTICLES;
+			}
+		}
+
+		public void render(){
+			int i = dataTail;
+			while ( i != dataHead ){
+				int offset = i * PARTICLE_SIZE;
+				float x = data[ offset + 0 ];
+				float y = data[ offset + 1 ];
+				float c = data[ offset + 4 ];
+				float b = (data[ offset + 5 ] / PARTICLE_LIFE);
+				if ( b > 0.0f ){
+					mInnerRenderTarget.drawShape( mSquare , c , b , x, y , b , 1.0f );
+				}
+				i = (i+1) % MAX_PARTICLES;
+			}
+		}
 	}
 }

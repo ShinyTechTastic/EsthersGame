@@ -23,12 +23,17 @@ public class Polygon extends AbstractShape {
         private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
 
         public Polygon( int sides ) {
+        	this( sides , 0.1f );
+        }
+        
+        public Polygon(int sides, float size) {
+
         	coords = new float[ sides * COORDS_PER_VERTEX ];
         	vertexCount = sides;
         	for ( int n = 0 ;n < sides ; n++ ){
         		double rad = ((Math.PI*2) / sides) * n;
-        		coords[ n * COORDS_PER_VERTEX + 0 ] = (float) (/* x */ 0.2f * Math.sin( rad ));
-        		coords[ n * COORDS_PER_VERTEX + 1 ] = (float) (/* y */ 0.2f * Math.cos( rad ));
+        		coords[ n * COORDS_PER_VERTEX + 0 ] = (float) (/* x */ size * Math.sin( rad ));
+        		coords[ n * COORDS_PER_VERTEX + 1 ] = (float) (/* y */ size * Math.cos( rad ));
         		coords[ n * COORDS_PER_VERTEX + 2 ] = /* z */ 0.0f;
         	}
         	
@@ -58,7 +63,8 @@ public class Polygon extends AbstractShape {
 
         }
 
-        public void draw(float[] mvpMatrix, float colour) {
+
+		public void draw(float[] mvpMatrix, float colour , float brigtness ) {
             // Add program to OpenGL environment
             GLES20.glUseProgram(mProgram);
 
@@ -77,7 +83,7 @@ public class Polygon extends AbstractShape {
             mColorHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
 
             // Set color for drawing the triangle
-            GLES20.glUniform4fv(mColorHandle, 1, this.getColour(colour) , 0 );
+            GLES20.glUniform4fv(mColorHandle, 1, this.getColour(colour,brigtness) , 0 );
 
             // get handle to shape's transformation matrix
             mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");

@@ -25,11 +25,21 @@ public class BasicGameState extends AbstractGameState {
 
 	@Override
 	public void press(float x, float y) {
-		for ( int n =0 ; n < MOVERS_COUNT ; n++ ){
+		if ( particle != null ){
+			for ( int i=0;i<20;i++){
+				double d = Math.random() * Math.PI * 2;
+				double s = (Math.random()*0.5) + 0.5;
+				particle.create(x, y, 
+						(float)(Math.sin(d) * s), 
+						(float)(Math.cos(d) * s),
+						(float)Math.random() );
+			}
+		}
+/*		for ( int n =0 ; n < MOVERS_COUNT ; n++ ){
 			movers[n].x = x;
 			movers[n].y = y;
 			
-		}
+		}*/
 	}
 
 	@Override
