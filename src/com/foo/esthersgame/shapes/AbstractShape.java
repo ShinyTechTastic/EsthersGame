@@ -28,7 +28,7 @@ public abstract class AbstractShape {
     	mfAcolour[1] = (float)((Math.sin( rad ) * 0.5 ) + 0.5);
     	rad += (Math.PI * 2.0 / 3.0);
     	mfAcolour[2] = (float)((Math.sin( rad ) * 0.5 ) + 0.5);
-    	mfAcolour[3] = 0.3f; // opacity is constant
+    	mfAcolour[3] = 0.8f; // opacity is constant
     	return mfAcolour;
     }
     
