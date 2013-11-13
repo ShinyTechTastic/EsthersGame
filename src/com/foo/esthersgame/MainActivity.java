@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
@@ -17,7 +18,42 @@ public class MainActivity extends Activity {
 	private static final String GAME_TAG = "Esther";
 	
 	private AbstractGameState gameState;
-    private GLSurfaceView mGLView;
+	
+
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		Log.i(GAME_TAG, "Recieved Key down "+keyCode);
+		if ( keyCode == KeyEvent.KEYCODE_BACK) {
+		    // Don't quit on back button, yet...
+			event.startTracking();
+		    return true;
+		}
+		return super.onKeyDown(keyCode, event);    
+	}
+	
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+		Log.i(GAME_TAG, "Recieved Key up "+keyCode);
+		if (    keyCode == KeyEvent.KEYCODE_BACK ) {
+		    // Don't quit on back button, yet...
+			event.startTracking();
+		    return true;
+		}
+		return super.onKeyUp(keyCode, event);    
+	}
+
+	@Override
+	public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+		Log.i(GAME_TAG, "Recieved Long press "+keyCode);
+		if (    keyCode == KeyEvent.KEYCODE_BACK ) {
+			this.finish(); // close the app
+		}
+		return super.onKeyLongPress(keyCode, event);
+	}
+
+
+	private GLSurfaceView mGLView;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
