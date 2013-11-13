@@ -62,32 +62,20 @@ public class BasicGameState extends AbstractGameState {
 		
 
 		public Mover(String hexCode, Bundle savedInstanceState) {
-			/*if ( savedInstanceState != null &&
-				savedInstanceState.containsKey(hexCode+".x") &&
-				savedInstanceState.containsKey(hexCode+".y")
-					){
-				x = savedInstanceState.getDouble( hexCode+".x" );
-				y = savedInstanceState.getDouble( hexCode+".y" );
-				vx = savedInstanceState.getDouble( hexCode+".vx" );
-				vy = savedInstanceState.getDouble( hexCode+".vy" );
-			}else{*/
-				x = (float) Math.random();
-				y = (float) Math.random();
-				r = (float) Math.random();
-				c = (float) Math.random();
-				vx = (float) (Math.random() - 0.5);
-				vy = (float) (Math.random() - 0.5);
-				vr = (float) (Math.random() - 0.5) * 60;
-				vc = (float) (Math.random() - 0.5);
-			//}
+			x = (float) Math.random() * 0.0f;
+			y = (float) Math.random() * 0.0f;
+			r = (float) Math.random() * 360.0f;
+			c = (float) Math.random();
+			vx = (float) (Math.random() - 0.5);
+			vy = (float) (Math.random() - 0.5);
+			vr = (float) (Math.random() - 0.5) * 60;
+			vc = (float) (Math.random() - 0.5);
 		}
 
 		public void render(int n , IRenderTarget render) {
 			render.drawShape( n , c , x ,y , r );
 		}
 
-		private static final float XRANGE = 1.0f;
-		private static final float YRANGE = 1.0f;
 		private static final float RRANGE = 180.0f;
 		private static final float CRANGE = (float)(Math.PI);
 		
@@ -96,10 +84,10 @@ public class BasicGameState extends AbstractGameState {
 			y += vy * t;
 			r += (vr * t);
 			c += (vc * t);
-			if ( x >  XRANGE ) x -= XRANGE * 2;
-			if ( x < -XRANGE ) x += XRANGE * 2;
-			if ( y >  YRANGE ) y -= YRANGE * 2;
-			if ( y < -YRANGE ) y += YRANGE * 2;
+			if ( x >  viewMaxX ) x -= viewWidth;
+			if ( x <  viewMinX ) x += viewWidth;
+			if ( y >  viewMaxY ) y -= viewHeight;
+			if ( y <  viewMinY ) y += viewHeight;
 			if ( r >  RRANGE ) r -= RRANGE * 2;
 			if ( r < -RRANGE ) r += RRANGE * 2;
 			if ( c >  CRANGE ) c -= CRANGE * 2;

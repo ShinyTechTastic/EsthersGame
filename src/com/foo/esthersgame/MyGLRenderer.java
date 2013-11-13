@@ -113,6 +113,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // in the onDrawFrame() method
         Matrix.frustumM(mProjMatrix, 0, -ratio, ratio, -1, 1, 3, 7);
 
+        gameState.resizeView(ratio * 2.0f, 2.0f);
     }
 
     public static int loadShader(int type, String shaderCode){
