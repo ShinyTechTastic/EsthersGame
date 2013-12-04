@@ -25,7 +25,7 @@ public class BasicGameState extends AbstractGameState {
 	}
 
 	@Override
-	public void press(float x, float y) {
+	public void press(float x, float y, ApplicationInterface app ) {
 		int nClosest = -1;
 		float dClosest = 0.01f;
 		
@@ -62,6 +62,9 @@ public class BasicGameState extends AbstractGameState {
 			movers[nClosest].randomPos();
 			movers[nClosest].randomRotation();
 			movers[nClosest].randomEmergeTime( 3.0f );// sometime within 3 seconds
+			
+			// vibrate etc.
+			app.doExplode();
 		}
 	}
 

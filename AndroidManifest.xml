@@ -8,11 +8,16 @@
         android:minSdkVersion="14"
         android:targetSdkVersion="19" />
 
+    <uses-permission android:name="android.permission.VIBRATE" />
+            
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme" 
+        android:largeHeap="false" 
+        android:persistent="false" 
+        android:hardwareAccelerated="true">
         <activity
             android:name="com.foo.esthersgame.MainActivity"
             android:label="@string/app_name" >

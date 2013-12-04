@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
@@ -13,7 +14,7 @@ import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements ApplicationInterface {
 
 	private static final String GAMESTATE_CLASS = "GameState-Class";
 	private static final String GAME_TAG = "Esther";
@@ -53,8 +54,8 @@ public class MainActivity extends Activity {
 		return super.onKeyLongPress(keyCode, event);
 	}
 
-
 	private GLSurfaceView mGLView;
+	private Vibrator vibrateService;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +64,10 @@ public class MainActivity extends Activity {
         requestWindowFeature( Window.FEATURE_NO_TITLE );
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, 
         		WindowManager.LayoutParams.FLAG_FULLSCREEN );
+        
+
+		// get the vibrate function
+		this.vibrateService = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         
         if ( savedInstanceState != null ){
 	    	String className = savedInstanceState.getString( GAMESTATE_CLASS , com.foo.esthersgame.BasicGameState.class.getCanonicalName() );
@@ -106,44 +111,50 @@ public class MainActivity extends Activity {
         // force the device to be used PORTRAIT
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
+    class MyGLSurfaceView extends GLSurfaceView {
+
+        private final MyGLRenderer mRenderer;
+
+        public MyGLSurfaceView(Context context, AbstractGameState gameState) {
+            super(context);
+
+            // Create an OpenGL ES 2.0 context.
+            setEGLContextClientVersion(2);
+
+            // Set the Renderer for drawing on the GLSurfaceView
+            mRenderer = new MyGLRenderer( gameState );
+            setRenderer(mRenderer);
+
+            // Render the view only when there is a change in the drawing data
+            setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+        }
+
+        @Override
+        public boolean onTouchEvent(MotionEvent e) {
+
+            float x = e.getX();
+            float y = e.getY();
+
+            switch (e.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                float[] worldPos = mRenderer.getWorldPosition( x , y );
+                
+                x = worldPos[0];
+                y = worldPos[1];
+     
+                gameState.press(x, y , MainActivity.this );
+                
+                break;
+            }
+            return true; // handled
+        }
+    }
     
 
-class MyGLSurfaceView extends GLSurfaceView {
-
-    private final MyGLRenderer mRenderer;
-
-    public MyGLSurfaceView(Context context, AbstractGameState gameState) {
-        super(context);
-
-        // Create an OpenGL ES 2.0 context.
-        setEGLContextClientVersion(2);
-
-        // Set the Renderer for drawing on the GLSurfaceView
-        mRenderer = new MyGLRenderer( gameState );
-        setRenderer(mRenderer);
-
-        // Render the view only when there is a change in the drawing data
-        setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent e) {
-
-        float x = e.getX();
-        float y = e.getY();
-
-        switch (e.getAction()) {
-        case MotionEvent.ACTION_DOWN:
-            float[] worldPos = mRenderer.getWorldPosition( x , y );
-            
-            x = worldPos[0];
-            y = worldPos[1];
- 
-            gameState.press(x, y);
-            
-            break;
-        }
-        return true; // handled
-    }
-}
-}
+	private static final long[] VIBRATE_PATTERN = { 0/*ms off*/, 50/*ms on*/,50/*ms off*/,100/*ms on*/,50/*ms off*/,50/*ms on*/};
+	
+	@Override
+	public void doExplode() {
+		this.vibrateService.vibrate(VIBRATE_PATTERN, -1 /* no repeat*/);
+	}
+   }
