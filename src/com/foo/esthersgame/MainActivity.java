@@ -6,6 +6,7 @@ import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -101,6 +102,9 @@ public class MainActivity extends Activity {
         // If you de-allocated graphic objects for onPause()
         // this is a good place to re-allocate them.
         mGLView.onResume();
+        
+        // force the device to be used PORTRAIT
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
     
 

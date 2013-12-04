@@ -4,7 +4,8 @@ import android.os.Bundle;
 
 public class BasicGameState extends AbstractGameState {
 
-	private static final int MOVERS_COUNT = 20;
+	private static final int MOVERS_COUNT = 10;
+	private static final float MOVERS_SPEED = 0.3f;
 	
 	private Mover[] movers = new Mover[ MOVERS_COUNT ];
 	
@@ -25,22 +26,43 @@ public class BasicGameState extends AbstractGameState {
 
 	@Override
 	public void press(float x, float y) {
-		if ( particle != null ){ // check we have a functioning particle system
-			float c = (float)Math.random();
-			for ( int i=0;i<20;i++){
-				double d = Math.random() * Math.PI * 2;
-				double s = (Math.random()*0.5) + 0.5;
-				particle.create(x, y, 
-						(float)(Math.sin(d) * s), 
-						(float)(Math.cos(d) * s),
-						c );
+		int nClosest = -1;
+		float dClosest = 0.01f;
+		
+		for ( int n =0 ; n < MOVERS_COUNT ; n++ ){
+			if ( movers[n].size > 0.9f ){
+				float dx = movers[n].x - x;
+				float dy = movers[n].y - y;
+				float dSquared = (dx*dx) + (dy*dy);
+				
+				if ( dSquared < dClosest ){
+					dClosest = dSquared;
+					nClosest = n;
+				}
 			}
 		}
-/*		for ( int n =0 ; n < MOVERS_COUNT ; n++ ){
-			movers[n].x = x;
-			movers[n].y = y;
 			
-		}*/
+		if ( nClosest > -1 ){ /* about 100th of the screen size from the centre*/
+			float c = movers[nClosest].c;
+
+			// Fire some particles (about 20, of roughly the right colour)
+			if ( particle != null ){ // check we have a functioning particle system
+				for ( int i=0;i<10;i++){
+							double d = Math.random() * Math.PI * 2;
+				double s = (Math.random()*0.5) + 0.5;
+				particle.create(movers[nClosest].x, movers[nClosest].y, 
+						(float)(Math.sin(d) * s), 
+						(float)(Math.cos(d) * s),
+						(float)(c + (Math.random() - 0.5 ) *0.1f) );
+						}	
+			}
+			
+			// recreate the shape somewhere else
+			movers[nClosest].randomColour();
+			movers[nClosest].randomPos();
+			movers[nClosest].randomRotation();
+			movers[nClosest].randomEmergeTime( 3.0f );// sometime within 3 seconds
+		}
 	}
 
 	@Override
@@ -51,6 +73,7 @@ public class BasicGameState extends AbstractGameState {
 	}
 
 	public class Mover {
+		public float size;
 		public float x;
 		public float y;
 		public float vx;
@@ -62,18 +85,37 @@ public class BasicGameState extends AbstractGameState {
 		
 
 		public Mover(String hexCode, Bundle savedInstanceState) {
-			x = (float) Math.random() * 0.0f;
-			y = (float) Math.random() * 0.0f;
-			r = (float) Math.random() * 360.0f;
+			randomPos();
+			randomRotation();
+			randomColour();
+			randomEmergeTime( 10.0f );// sometime within 10 seconds
+		}
+
+		private void randomColour() {
 			c = (float) Math.random();
-			vx = (float) (Math.random() - 0.5);
-			vy = (float) (Math.random() - 0.5);
-			vr = (float) (Math.random() - 0.5) * 60;
 			vc = (float) (Math.random() - 0.5);
 		}
 
+		private void randomRotation() {
+			r = (float) Math.random() * 360.0f;
+			vr = (float) (Math.random() - 0.5) * 60;
+		}
+
+		private void randomPos() {
+			x = (float)(Math.random() - 0.5) * 2.0f;
+			y = (float)(Math.random() - 0.5) * 2.0f;
+			vx = (float) (Math.random() - 0.5) * MOVERS_SPEED;
+			vy = (float) (Math.random() - 0.5) * MOVERS_SPEED;
+		}
+		
+		private void randomEmergeTime( float scale ){
+			size = (float) (scale * Math.random());
+		}
+
 		public void render(int n , IRenderTarget render) {
-			render.drawShape( n , c , x ,y , r );
+			if ( size > 0.0f ){
+				render.drawShape( n , c , x ,y , r , size );
+			}
 		}
 
 		private static final float RRANGE = 180.0f;
@@ -84,6 +126,11 @@ public class BasicGameState extends AbstractGameState {
 			y += vy * t;
 			r += (vr * t);
 			c += (vc * t);
+			if ( size < 1.0f ){
+				size += t;
+			}else{
+				size = 1.0f;
+			}
 			if ( x >  viewMaxX ) x -= viewWidth;
 			if ( x <  viewMinX ) x += viewWidth;
 			if ( y >  viewMaxY ) y -= viewHeight;

@@ -59,7 +59,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // Set the background frame color
         GLES20.glClearColor(0.0f, 0.0f, 0.3f, 1.0f);
         GLES20.glEnable( GLES20.GL_BLEND );
-        GLES20.glBlendFunc( GLES20.GL_SRC_ALPHA , GLES20.GL_ONE_MINUS_SRC_ALPHA );
+        //GLES20.glBlendFunc( GLES20.GL_SRC_ALPHA , GLES20.GL_ONE_MINUS_SRC_ALPHA );
+        GLES20.glBlendFunc( GLES20.GL_SRC_ALPHA , GLES20.GL_ONE );
 
         mShapes = new AbstractShape[11];
     	mShapes[0] = new Star( 4 );
@@ -215,8 +216,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 			//Matrix.setRotateM(mModelMatrix, 0, mAngle, 0, 0, -1.0f);
 			Matrix.setIdentityM(mModelMatrix , 0);
-			Matrix.scaleM(mModelMatrix, 0 , scale, scale, 0.0f );
 			Matrix.translateM( mModelMatrix, 0, (float)x, (float)y, 0);
+			Matrix.scaleM(mModelMatrix, 0 , scale, scale, 0.0f );
 			Matrix.rotateM(mModelMatrix, 0, rotation, 0.0f, 0.0f, -1.0f );
 			//float[] scratch = new float[16];
 			// Combine the rotation matrix with the projection and camera view
@@ -250,6 +251,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 		private static final int MAX_PARTICLES = 200; // max onscreen at once
 		private static final int PARTICLE_SIZE = 6; // floats in the data structure
 		private static final float PARTICLE_LIFE = 5.0f; // seconds to live
+		private static final float PARTICLE_RENDER_SIZE = 0.4f; // the size on screen.
 		
 		private float[] data = new float[ PARTICLE_SIZE * MAX_PARTICLES ];
 		private int dataHead = 0;
@@ -281,11 +283,11 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 				data[ offset + 0 ] += data[ offset + 2 ] * t;
 				data[ offset + 1 ] += data[ offset + 3 ] * t;
-				if ( data[ offset + 1 ] < -1.0f ){ // bounce?
-					data[ offset + 1 ] = -2.0f - data[ offset + 1 ]; // bounce distance
+				if ( data[ offset + 1 ] > 1.0f ){ // bounce? (from the top as we're upside down)
+					data[ offset + 1 ] = 2.0f - data[ offset + 1 ]; // bounce distance
 					data[ offset + 3 ] = data[ offset + 3 ] * -0.8f; // invert the vertical velocity and reduce slightly
 				}
-				data[ offset + 3 ] -= 0.5f * t; // g
+				data[ offset + 3 ] += 0.5f * t; // g
 				data[ offset + 5 ] -= t;
 				
 				if ( data[ offset + 5 ] < 0.0 ){
@@ -306,7 +308,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 				float c = data[ offset + 4 ];
 				float b = (data[ offset + 5 ] / PARTICLE_LIFE);
 				if ( b > 0.0f ){
-					mInnerRenderTarget.drawShape( mSquare , c , b , x, y , b * 90.0f , 1.0f );
+					mInnerRenderTarget.drawShape( mSquare , c , b , x, y , b * 90.0f ,PARTICLE_RENDER_SIZE );
 				}
 				i = (i+1) % MAX_PARTICLES;
 			}
